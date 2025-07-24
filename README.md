@@ -59,11 +59,11 @@ Note: The code formatter does not remove unused imports by default. You should
 enable [Optimise on save](https://www.jetbrains.com/help/idea/creating-and-optimizing-imports.html#optimize-on-save) in
 your IntelliJ IDEA settings to ensure you do not commit unused imports.
 
-# Build
+## Build
 
 IntelliJ will automatically build your code as needed. To build using Gradle, follow the instructions below.
 
-## Gradle
+### Gradle
 
 Any tasks you run from the root project, without specifying a project name will be run on all the children. To build the
 entire repository using Gradle, run:
@@ -81,7 +81,7 @@ To build just a specific project:
 ./gradlew api:build
 ```
 
-## Docker
+### Docker
 
 To build Docker images locally, run:
 
@@ -89,9 +89,9 @@ To build Docker images locally, run:
 ./gradlew jibDockerBuild
 ```
 
-# Run
+## Run
 
-## IntelliJ
+### IntelliJ
 
 In IntelliJ IDEA, a Spring Boot [run configuration](https://www.jetbrains.com/help/idea/run-debug-configuration.html) is
 automatically made available for each service. Select it from the toolbar, and click either Run or Debug. The service
@@ -99,7 +99,7 @@ will start in the `dev` profile, which configures any embedded test data and ser
 
 Run configuration files are stored in [.idea/runConfigurations](.idea/runConfigurations).
 
-## Gradle
+### Gradle
 
 To run Gradle tasks in a subproject, prepend the task name with the name of the project. Environment variables can be
 used to set the Spring profile. For example,
@@ -108,9 +108,7 @@ used to set the Spring profile. For example,
 SPRING_PROFILES_ACTIVE=dev ./gradlew <project-name>:bootRun
 ```
 
-# Project
-
-# Support
+## Support
 
 For any issues or questions, please contact the Probation Integration team via the [#probation-integration-tech](https://mojdt.slack.com/archives/C02HQ4M2YQN)
 Slack channel. Or feel free to create a [new issue](https://github.com/ministryofjustice/hmpps-probation-search-services/issues/new)
