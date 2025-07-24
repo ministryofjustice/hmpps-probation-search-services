@@ -1,0 +1,39 @@
+name: Lint
+# Lint config files and scripts (e.g. Bash scripts, GitHub Actions workflows, XML, YML)
+
+on:
+  push:
+    branches-ignore:
+      - main
+
+permissions:
+  contents: read
+  packages: read
+  statuses: write
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Lint changes
+        uses: github/super-linter/slim@v7
+        env:
+          DEFAULT_BRANCH: main
+          VALIDATE_ALL_CODEBASE: false # changes only
+          VALIDATE_BASH: true
+          VALIDATE_BASH_EXEC: true
+          VALIDATE_DOCKERFILE_HADOLINT: true
+          VALIDATE_GITHUB_ACTIONS: true
+          VALIDATE_RUBY: true
+          VALIDATE_XML: true
+          VALIDATE_YAML: true
+          LINTER_RULES_PATH: /
+          FILTER_REGEX_EXCLUDE: .*templates/.*.ya?ml
+          BASH_SEVERITY: warning
+          GITHUB_ACTIONS_CONFIG_FILE: .github/actionlint.yml
+          GITHUB_ACTIONS_COMMAND_ARGS: -ignore=SC.+:info:.+
+          GITHUB_TOKEN: ${{ github.token }}
