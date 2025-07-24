@@ -1,70 +1,115 @@
-# Ministry of Justice Template Repository
+# Probation Search Services
 
-[![Ministry of Justice Repository Compliance Badge](https://github-community.service.justice.gov.uk/repository-standards/api/template-repository/badge)](https://github-community.service.justice.gov.uk/repository-standards/template-repository)
+[![Repository Standards](https://img.shields.io/badge/dynamic/json?color=blue&logo=github&label=MoJ%20Compliant&query=%24.message&url=https%3A%2F%2Foperations-engineering-reports.cloud-platform.service.justice.gov.uk%2Fapi%2Fv1%2Fcompliant_public_repositories%2Fhmpps-probation-search-services)](https://operations-engineering-reports.cloud-platform.service.justice.gov.uk/repository-standards/hmpps-probation-search-services "Link to report")
+[![Security](https://github.com/ministryofjustice/hmpps-probation-search-services/actions/workflows/security.yml/badge.svg)](https://github.com/ministryofjustice/hmpps-probation-search-services/actions/workflows/security.yml)
 
-This template repository equips you with the default initial files required for a Ministry of Justice GitHub repository.
+A collection of independently deployable services for indexing and searching probation data via OpenSearch, including:
 
-## Included Files
+* **Search APIs** - expose endpoints for querying probation data.
+* **Indexing Pipelines** - consume data from upstream sources into OpenSearch.
+* **OpenSearch Configuration** - custom analyzers, mappings and templates.
 
-The repository comes with the following preset files:
+## Tooling
 
-- LICENSE
-- .gitignore
-- CODEOWNERS
-- dependabot.yml
-- GitHub Actions example files
-- Ministry of Justice Compliance Badge (public repositories only)
+* Code is written in [Kotlin](https://kotlinlang.org/), using [Spring Boot](https://spring.io/projects/spring-boot)
+* Built using [Gradle](https://gradle.org/) on [GitHub Actions](https://help.github.com/en/actions)
+* Tested with [Spring Boot Test](https://docs.spring.io/spring-boot/docs/current/reference/html/features.html#features.testing)
+  and [Testcontainers](https://testcontainers.com/)
+* Container images are built with [Jib](https://github.com/GoogleContainerTools/jib#readme), and pushed
+  to [GitHub Packages](https://github.com/orgs/ministryofjustice/packages?repo_name=hmpps-probation-search-services)
+* Code formatting by [IntelliJ IDEA formatter](https://www.jetbrains.com/help/idea/command-line-formatter.html),
+  according to [Kotlin Coding Conventions](https://kotlinlang.org/docs/coding-conventions.html)
 
-## Setup Instructions
+## Structure
 
-Once you've created your repository using this template, ensure the following steps:
+This repository is structured as a monorepo containing an individually deployable project per service.
 
-### Update README
+The directory layout is as follows:
 
-Edit this README.md file to document your project accurately. Take the time to create a clear, engaging, and informative README.md file. Include information like what your project does, how to install and run it, how to contribute, and any other pertinent details.
-
-### Update repository description
-
-After you've created your repository, GitHub provides a brief description field that appears on the top of your repository's main page. This is a summary that gives visitors quick insight into the project. Using this field to provide a succinct overview of your repository is highly recommended.
-
-This description and your README.md will be one of the first things people see when they visit your repository. It's a good place to make a strong, concise first impression. Remember, this is often visible in search results on GitHub and search engines, so it's also an opportunity to help people discover your project.
-
-### Grant Team Permissions
-
-Assign permissions to the appropriate Ministry of Justice teams. Ensure at least one team is granted Admin permissions. Whenever possible, assign permissions to teams rather than individual users.
-
-Prefer to user GitHub Teams over individual access to repositories. Where appropriate, ensure GitHub Teams used are related to a Parent Team associated with a Business Unit to help ensure ownership can be easily identified.
-
-### Read about the GitHub repository standards
-
-Familiarise yourself with the Ministry of Justice GitHub Repository Standards. These standards ensure consistency, maintainability, and best practices across all our repositories.
-
-You can find the standards [here](https://github-community.service.justice.gov.uk/repository-standards/guidance).
-
-Please read and understand these standards thoroughly and enable them when you feel comfortable.
-
-### Modify the GitHub Standards Badge
-
-Once you've ensured that all the [GitHub Repository Standards](https://github-community.service.justice.gov.uk/repository-standards/guidance) have been applied to your repository, it's time to update the Ministry of Justice (MoJ) Compliance Badge located in the README file.
-
-The badge demonstrates that your repository is compliant with MoJ's standards.
-
-To update the badge, replace the `template-repository` in the badge URL with your repository's name. The badge URL should look like this:
-
-```markdown
-[![Ministry of Justice Repository Compliance Badge](https://github-community.service.justice.gov.uk/repository-standards/api/${your-repository-name}/badge)](https://github-community.service.justice.gov.uk/repository-standards/${your-reposistory-name})
+```
+├── .github           ~ GitHub actions workflows and configuration
+├── .idea             ~ IntelliJ IDEA configuration
+└── projects          ~ Source code for each project
+    ├── project-1
+    ├── ...
+    └── project-n
 ```
 
-**Please note** the badge will not function correctly if your repository is internal or private. In this case, you may remove the badge from your README.
+## Development
 
-### Update CODEOWNERS
+To set up your development environment:
 
-(Optional) Modify the CODEOWNERS file to specify the teams or users authorized to approve pull requests.
+1. Open the project in [IntelliJ IDEA](https://www.jetbrains.com/idea/). Select "Import project from external model", then "Gradle".
+2. To run the tests for a service, right-click the project folder and select "Run tests".
+3. To start a service locally, launch the corresponding Spring Boot run/debug configuration.
+   See [Launch a run configuration](https://www.jetbrains.com/help/idea/run-debug-configuration.html#launch-run-configuration).
 
-### Configure Dependabot
+### Code formatting
 
-Adapt the dependabot.yml file to match your project's [dependency manager](https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file#package-ecosystem) and to enable [automated pull requests for package updates](https://docs.github.com/en/code-security/supply-chain-security).
+Kotlin code is formatted using IntelliJ IDEA's code formatter,
+which follows the [Kotlin Coding Conventions](https://kotlinlang.org/docs/coding-conventions.html).
 
-### Dependency Review
+GitHub Actions will automatically fix any formatting issues when you open a pull request. See [format.yml](.github/workflows/format.yml).
 
-If your repository is private with no GitHub Advanced Security license, remove the `.github/workflows/dependency-review.yml` file.
+You can also use <strong title="Command">⌘</strong><strong title="Option">⌥</strong>**L** (macOS),
+or **Ctrl+Alt+L** (Windows/Linux) to manually reformat your code in IntelliJ IDEA.
+See [Reformat code](https://www.jetbrains.com/help/idea/reformat-and-rearrange-code.html).
+
+Note: The code formatter does not remove unused imports by default. You should
+enable [Optimise on save](https://www.jetbrains.com/help/idea/creating-and-optimizing-imports.html#optimize-on-save) in
+your IntelliJ IDEA settings to ensure you do not commit unused imports.
+
+## Build
+
+IntelliJ will automatically build your code as needed. To build using Gradle, follow the instructions below.
+
+### Gradle
+
+Any tasks you run from the root project, without specifying a project name will be run on all the children. To build the
+entire repository using Gradle, run:
+
+```shell
+./gradlew build
+```
+
+To build just a specific project:
+
+```shell
+./gradlew <project-name>:build
+
+# For example,
+./gradlew api:build
+```
+
+### Docker
+
+To build Docker images locally, run:
+
+```shell
+./gradlew jibDockerBuild
+```
+
+## Run
+
+### IntelliJ
+
+In IntelliJ IDEA, a Spring Boot [run configuration](https://www.jetbrains.com/help/idea/run-debug-configuration.html) is
+automatically made available for each service. Select it from the toolbar, and click either Run or Debug. The service
+will start in the `dev` profile, which configures any embedded test data and services.
+
+Run configuration files are stored in [.idea/runConfigurations](.idea/runConfigurations).
+
+### Gradle
+
+To run Gradle tasks in a subproject, prepend the task name with the name of the project. Environment variables can be
+used to set the Spring profile. For example,
+
+```shell
+SPRING_PROFILES_ACTIVE=dev ./gradlew <project-name>:bootRun
+```
+
+## Support
+
+For any issues or questions, please contact the Probation Integration team via the [#probation-integration-tech](https://mojdt.slack.com/archives/C02HQ4M2YQN)
+Slack channel. Or feel free to create a [new issue](https://github.com/ministryofjustice/hmpps-probation-search-services/issues/new)
+in this repository.

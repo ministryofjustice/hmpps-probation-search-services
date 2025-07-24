@@ -1,0 +1,14 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="api" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <option name="ACTIVE_PROFILES" value="dev" />
+    <classpathModifications>
+      <entry path="$PROJECT_DIR$/projects/api/build/classes/kotlin/dev" />
+      <entry path="$PROJECT_DIR$/projects/api/build/resources/dev" />
+    </classpathModifications>
+    <module name="probation-search-services.api.dev" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="uk.gov.justice.digital.hmpps.App" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
