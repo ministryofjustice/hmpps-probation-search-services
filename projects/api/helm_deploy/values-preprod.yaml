@@ -1,0 +1,23 @@
+generic-service:
+  ingress:
+    host: probation-search-api-preprod.hmpps.service.justice.gov.uk
+
+  env:
+    SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: "https://sign-in-preprod.hmpps.service.justice.gov.uk/auth/.well-known/jwks.json"
+    SENTRY_ENVIRONMENT: preprod
+
+  scheduledDowntime:
+    enabled: true
+    timeZone: Europe/London
+
+  allowlist:
+    groups:
+      - delius-preprod
+
+generic-prometheus-alerts:
+  alertSeverity: probation-integration-notifications
+  businessHoursOnly: true
+  openSearchAlertsDomainNames:
+    cloud-platform-15f6e3af: OpenSearch
+  openSearchAlertsFreeStorageSpaceThresholdGB: 375
+  openSearchAlertsClusterStatusYellowMinutes: 180 # cluster status can be yellow during replication following data re-indexing - this is expected

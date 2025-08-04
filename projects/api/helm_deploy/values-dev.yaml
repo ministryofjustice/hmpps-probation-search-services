@@ -1,0 +1,22 @@
+generic-service:
+  ingress:
+    host: probation-search-api-dev.hmpps.service.justice.gov.uk
+
+  env:
+    SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: "https://sign-in-dev.hmpps.service.justice.gov.uk/auth/.well-known/jwks.json"
+    SENTRY_ENVIRONMENT: dev
+
+  scheduledDowntime:
+    enabled: true
+    timeZone: Europe/London
+
+  allowlist:
+    groups:
+      - delius-test
+
+generic-prometheus-alerts:
+  alertSeverity: probation-integration-notifications
+  businessHoursOnly: true
+  openSearchAlertsDomainNames:
+    cloud-platform-7ee2c0ee: OpenSearch
+  openSearchAlertsFreeStorageSpaceThresholdGB: 7.5

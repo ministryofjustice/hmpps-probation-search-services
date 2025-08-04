@@ -3,13 +3,11 @@ rootProject.name = "probation-search-services"
 dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
-            library("azure-app-insights", "com.microsoft.azure:applicationinsights-web:3.7.3")
+            library("applicationinsights", "com.microsoft.azure:applicationinsights-web:3.7.3")
             library("opensearch-starter", "org.opensearch.client:spring-data-opensearch-starter:2.0.0")
             library("opensearch-client", "org.opensearch.client:opensearch-java:3.2.0")
             library("testcontainers-opensearch", "org.opensearch:opensearch-testcontainers:3.0.2")
-            library("sentry", "io.sentry:sentry-spring-boot-starter-jakarta:8.17.0")
             library("springdoc", "org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9")
-            bundle("telemetry", listOf("azure-app-insights", "sentry"))
         }
     }
 }

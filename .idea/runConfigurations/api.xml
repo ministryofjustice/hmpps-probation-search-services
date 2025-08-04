@@ -6,7 +6,7 @@
       <entry path="$PROJECT_DIR$/projects/api/build/resources/dev" />
     </classpathModifications>
     <module name="probation-search-services.api.dev" />
-    <option name="SPRING_BOOT_MAIN_CLASS" value="uk.gov.justice.digital.hmpps.App" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="uk.gov.justice.digital.hmpps.probation.search.App" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

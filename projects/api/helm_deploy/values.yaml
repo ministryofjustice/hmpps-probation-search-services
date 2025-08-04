@@ -1,0 +1,43 @@
+generic-service:
+  nameOverride: api
+
+  replicaCount: 2
+  resources:
+    requests:
+      cpu: "0.125"
+      memory: 1Gi
+    limits:
+      cpu: "1"
+      memory: 1Gi
+
+  image:
+    repository: ghcr.io/ministryofjustice/hmpps-probation-search-services/api
+    port: 8080
+
+  ingress:
+    enabled: true
+    tlsSecretName: probation-search-api-cert
+
+  env:
+    SENTRY_TRACES_SAMPLE_RATE: '0.05'
+
+  namespace_secrets:
+    common:
+      APPLICATIONINSIGHTS_CONNECTION_STRING: APPLICATIONINSIGHTS_CONNECTION_STRING
+      SPRING_DATASOURCE_URL: DB_URL
+      SPRING_DATASOURCE_USERNAME: DB_USERNAME
+      SPRING_DATASOURCE_PASSWORD: DB_PASSWORD
+    api-sentry:
+      SENTRY_DSN: SENTRY_DSN
+    opensearch:
+      OPENSEARCH_URIS: "url"
+    sqs-hmpps-audit-secret:
+      HMPPS_SQS_QUEUES_AUDIT_QUEUE_NAME: sqs_queue_name
+
+  allowlist:
+    groups:
+      - moj_cloud_platform
+      - unilink_staff
+
+generic-prometheus-alerts:
+  targetApplication: probation-search-api

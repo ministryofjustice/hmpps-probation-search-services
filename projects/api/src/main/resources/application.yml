@@ -33,6 +33,7 @@ server.shutdown: immediate
 
 spring:
   datasource.url: jdbc:tc:oracle:slim-faststart:///XEPDB1?TC_TMPFS=/testtmpfs:rw
+  jpa.database: oracle
   jpa.hibernate.ddl-auto: create
 
 logging.level:

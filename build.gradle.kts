@@ -1,6 +1,11 @@
+import com.google.cloud.tools.jib.gradle.BuildDockerTask
+import com.google.cloud.tools.jib.gradle.BuildImageTask
+import com.google.cloud.tools.jib.gradle.BuildTarTask
 import com.google.cloud.tools.jib.gradle.JibExtension
 import com.google.cloud.tools.jib.gradle.JibTask
+import io.sentry.android.gradle.extensions.SentryPluginExtension
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.springframework.boot.gradle.tasks.buildinfo.BuildInfo
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 import org.springframework.boot.gradle.tasks.run.BootRun
 
@@ -11,11 +16,12 @@ plugins {
     id("org.springframework.boot") version "3.5.4" apply false
     id("io.spring.dependency-management") version "1.1.7" apply false
     id("com.google.cloud.tools.jib") version "3.4.5" apply false
+    id("io.sentry.jvm.gradle") version "5.8.0" apply false
     id("idea")
 }
 
 allprojects {
-    group = "uk.gov.justice.digital"
+    group = "uk.gov.justice.digital.hmpps.probation.search"
     repositories {
         mavenLocal()
         mavenCentral()
@@ -30,6 +36,7 @@ subprojects {
         plugin("org.springframework.boot")
         plugin("io.spring.dependency-management")
         plugin("com.google.cloud.tools.jib")
+        plugin("io.sentry.jvm.gradle")
         plugin("idea")
     }
 
@@ -75,7 +82,6 @@ subprojects {
             into("${project.layout.buildDirectory.dir("agent").get().asFile}")
             include("applicationinsights.json")
         }
-        withType<JibTask> { dependsOn("copyAgent", "copyAgentConfig", "assemble") }
         // Ensure build is reproducible
         withType<Jar> {
             isPreserveFileTimestamps = false
@@ -83,6 +89,8 @@ subprojects {
             archiveFileName.set("${archiveBaseName.get()}-${archiveClassifier.get()}.${archiveExtension.get()}")
         }
         withType<BootJar> { enabled = false }
+        // Generate build info into a different directory so that it isn't included in the final image - to improve caching and reproducibility
+        register<BuildInfo>("buildInfo") { destinationDir = layout.buildDirectory.dir("info") }
         // Include the dev source set when running with the dev Spring Boot profile
         withType<BootRun> {
             val profiles = System.getProperty("spring.profiles.active", System.getenv("SPRING_PROFILES_ACTIVE"))
@@ -95,25 +103,48 @@ subprojects {
             systemProperty("spring.profiles.active", "dev")
             useJUnitPlatform()
         }
-    }
-
-    idea {
-        module {
-            if (System.getenv("CI") == null) {
-                isDownloadJavadoc = true
-                isDownloadSources = true
+        // Customise the Jib tasks to enable caching
+        fun <T : JibTask> T.configureJibTask(jib: T.() -> JibExtension) {
+            dependsOn("copyAgent", "copyAgentConfig", "assemble")
+            // Set variable configuration in a doFirst block to avoid invalidating the Gradle cache
+            doFirst {
+                jib().to {
+                    tags = setOf(System.getenv("VERSION") ?: "dev")
+                    auth {
+                        username = System.getenv("JIB_USERNAME")
+                        password = System.getenv("JIB_PASSWORD")
+                    }
+                }
             }
-            // Register dev source set in IntelliJ IDEA
-            testSources.from(sourceSets["dev"].allSource.srcDirs)
-            testResources.from(sourceSets["dev"].resources.srcDirs)
+            if (System.getenv("FORCE_DEPLOY") == "true") {
+                jib().to.tags = setOf(System.getenv("VERSION") ?: "dev")
+            }
+            // Enable caching
+            val buildDir = layout.buildDirectory.get().asFile.path
+            inputs.files(
+                "helm_deploy",
+                "$buildDir/agent",
+                "$buildDir/classes",
+                "$buildDir/generated",
+                "$buildDir/libs",
+                "$buildDir/resources"
+            )
+            outputs.files("$buildDir/jib-image.id")
+            outputs.cacheIf { true }
+            // Generate a marker file to indicate whether a new image was built
+            doLast { layout.buildDirectory.file("jib-image.changed").get().asFile.createNewFile() }
         }
+        withType<BuildDockerTask> { configureJibTask { jib!! } }
+        withType<BuildImageTask> { configureJibTask { jib!! } }
+        withType<BuildTarTask> { configureJibTask { jib!! } }
     }
 
     pluginManager.withPlugin("com.google.cloud.tools.jib") {
+        // Configure container image
         extensions.configure<JibExtension> {
             container {
-                jvmFlags = mutableListOf("-Duser.timezone=Europe/London")
-                mainClass = "uk.gov.justice.digital.hmpps.AppKt"
+                jvmFlags = mutableListOf("-Duser.timezone=Europe/London -javaagent:/agent/agent.jar")
+                mainClass = "uk.gov.justice.digital.hmpps.probation.search.AppKt"
                 user = "2000:2000"
             }
             from { image = System.getenv("JIB_FROM_IMAGE") ?: "eclipse-temurin:21-jre-alpine" }
@@ -126,6 +157,29 @@ subprojects {
                     }
                 }
             }
+        }
+    }
+
+    pluginManager.withPlugin("io.sentry.jvm.gradle") {
+        // Upload sources to Sentry
+        extensions.configure<SentryPluginExtension> {
+            org = "ministryofjustice"
+            projectName = "probation-search-api"
+            authToken = System.getenv("SENTRY_AUTH_TOKEN")
+            includeSourceContext = System.getenv("SENTRY_AUTH_TOKEN") != null
+        }
+    }
+
+    idea {
+        module {
+            // Download sources when developing locally
+            if (System.getenv("CI") == null) {
+                isDownloadJavadoc = true
+                isDownloadSources = true
+            }
+            // Register dev source set in IntelliJ IDEA
+            testSources.from(sourceSets["dev"].allSource.srcDirs)
+            testResources.from(sourceSets["dev"].resources.srcDirs)
         }
     }
 }
