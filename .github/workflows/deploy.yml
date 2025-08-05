@@ -41,7 +41,6 @@ jobs:
   deploy:
     uses: ./.github/workflows/pipeline-deploy.yml
     needs: build
-    concurrency: deploy-${{ inputs.project }}-${{ inputs.environment }}
     with:
       environment: ${{ inputs.environment }}
       project: ${{ inputs.project }}
