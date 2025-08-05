@@ -38,11 +38,21 @@ jobs:
     secrets:
       SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
-  deploy:
+  deploy-build:
+    if: inputs.version == ''
     uses: ./.github/workflows/pipeline-deploy.yml
     needs: build
     with:
       environment: ${{ inputs.environment }}
       project: ${{ inputs.project }}
-      version: ${{ needs.build.outputs.version }}
+      version: ${{needs.build.outputs.version }}
+    secrets: inherit
+
+  deploy-version:
+    if: inputs.version != ''
+    uses: ./.github/workflows/pipeline-deploy.yml
+    with:
+      environment: ${{ inputs.environment }}
+      project: ${{ inputs.project }}
+      version: ${{ inputs.version}}
     secrets: inherit
