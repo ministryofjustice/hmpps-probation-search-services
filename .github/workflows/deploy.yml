@@ -45,3 +45,4 @@ jobs:
       environment: ${{ inputs.environment }}
       project: ${{ inputs.project }}
       version: ${{ needs.build.outputs.version }}
+    secrets: inherit
