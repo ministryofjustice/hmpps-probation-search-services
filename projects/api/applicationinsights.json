@@ -1,6 +1,6 @@
 {
   "role": {
-    "name": "hmpps-probation-search-api"
+    "name": "probation-search-api"
   },
   "customDimensions": {
     "service.version": "${VERSION}",

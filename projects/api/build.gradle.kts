@@ -12,7 +12,7 @@ dependencies {
     implementation(libs.opensearch.starter) {
         exclude("org.opensearch.client", "opensearch-rest-high-level-client")
     }
-    implementation(libs.bundles.telemetry)
+    implementation(libs.applicationinsights)
 
     dev(libs.testcontainers.opensearch)
     dev("org.testcontainers:oracle-free")

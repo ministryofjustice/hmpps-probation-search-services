@@ -5,14 +5,45 @@ on:
     branches-ignore:
       - main
   workflow_call:
+    inputs:
+      projects:
+        description: JSON array of projects to build (leave blank to build all changes)
+        type: string
+        required: false
+      push:
+        description: Push images to the registry?
+        type: boolean
+        default: false
+      force:
+        description: Push images to the registry even if there are no source changes?
+        type: boolean
+        default: false
+    secrets:
+      SENTRY_AUTH_TOKEN:
+        required: false
+    outputs:
+      changes:
+        description: Which projects had changes?
+        value: ${{ jobs.build.outputs.changes }}
+      version:
+        description: The generated image version
+        value: ${{ jobs.build.outputs.version }}
 
 permissions:
   contents: read
   checks: write
+  packages: write
 
 jobs:
   build:
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      changes: ${{ steps.check-changes.outputs.projects }}
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        project:
+          - api
     steps:
       - uses: actions/checkout@v4
 
@@ -25,5 +56,56 @@ jobs:
         with:
           add-job-summary: 'on-failure'
 
+      - name: Set version
+        id: version
+        run: echo "version=$(date '+%Y-%m-%d').${{ github.run_number }}.$(echo ${{ github.sha }} | cut -c1-7)" | tee -a "$GITHUB_ENV" "$GITHUB_OUTPUT"
+
       - name: Build
-        run: ./gradlew check
+        run: ./gradlew ${{ matrix.project }}:check
+
+      - name: Push
+        if: inputs.push
+        uses: nick-fields/retry@ce71cc2ab81d554ebbe88c79ab5975992d79ba08 # v3.0.2
+        with:
+          max_attempts: 3 # Pushing lots of new image versions at once can result in GitHub rate-limiting so we retry this step
+          timeout_minutes: 15
+          # Configuration cache is not yet supported for Jib - see: https://github.com/GoogleContainerTools/jib/issues/3132
+          command: ./gradlew ${{ matrix.project }}:jib --no-configuration-cache
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          JIB_USERNAME: ${{ github.actor }}
+          JIB_PASSWORD: ${{ github.token }}
+          FORCE_DEPLOY: ${{ inputs.force }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+
+      - name: Check for changes
+        id: check-changes
+        run: echo "projects=$(find projects -maxdepth 3 -type f -path 'projects/*/build/jib-image.changed' -printf '%h\n' | sed 's|^projects/||;s|/build$||' | jq -R . | jq -s -c '. // []')" | tee -a "$GITHUB_OUTPUT" changes-${{ matrix.project }}.json
+
+      - name: Store changes
+        uses: actions/upload-artifact@v4
+        with:
+          name: changes-${{ matrix.project }}
+          path: changes-${{ matrix.project }}.json
+
+      - name: Store test artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.project }}
+          path: |
+            **/build/jacoco
+            **/build/reports/jacoco/**/*.xml
+            **/build/test-results
+
+      - name: Get build info
+        if: steps.check-changes.outputs.projects != '[]'
+        run: ./gradlew ${{ matrix.project }}:buildInfo
+        env:
+          ORG_GRADLE_PROJECT_version: ${{ env.version }}
+
+      - name: Store build info
+        if: steps.check-changes.outputs.projects != '[]'
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-info-${{ matrix.project }}
+          path: projects/${{ matrix.project }}/build/info/build-info.properties

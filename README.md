@@ -3,10 +3,10 @@
 [![Repository Standards](https://img.shields.io/badge/dynamic/json?color=blue&logo=github&label=MoJ%20Compliant&query=%24.message&url=https%3A%2F%2Foperations-engineering-reports.cloud-platform.service.justice.gov.uk%2Fapi%2Fv1%2Fcompliant_public_repositories%2Fhmpps-probation-search-services)](https://operations-engineering-reports.cloud-platform.service.justice.gov.uk/repository-standards/hmpps-probation-search-services "Link to report")
 [![Security](https://github.com/ministryofjustice/hmpps-probation-search-services/actions/workflows/security.yml/badge.svg)](https://github.com/ministryofjustice/hmpps-probation-search-services/actions/workflows/security.yml)
 
-A collection of independently deployable services for indexing and searching probation data via OpenSearch, including:
+A collection of services for indexing and searching probation data, including:
 
-* **Search APIs** - expose endpoints for querying probation data.
-* **Indexing Pipelines** - consume data from upstream sources into OpenSearch.
+* **Search APIs** - endpoints for querying probation data.
+* **Indexing Pipelines** - event streams to consume data from upstream sources into OpenSearch.
 * **OpenSearch Configuration** - custom analyzers, mappings and templates.
 
 ## Tooling
