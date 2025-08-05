@@ -17,10 +17,6 @@ on:
           - dev
           - preprod
           - prod
-      version:
-        description: Image version (leave blank to build from branch)
-        type: string
-        required: false
 
 permissions:
   contents: read
@@ -29,7 +25,6 @@ permissions:
 
 jobs:
   build:
-    if: inputs.version == ''
     uses: ./.github/workflows/build.yml
     with:
       push: true
@@ -38,21 +33,11 @@ jobs:
     secrets:
       SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
-  deploy-build:
-    if: inputs.version == ''
+  deploy:
     uses: ./.github/workflows/pipeline-deploy.yml
     needs: build
     with:
       environment: ${{ inputs.environment }}
       project: ${{ inputs.project }}
       version: ${{needs.build.outputs.version }}
-    secrets: inherit
-
-  deploy-version:
-    if: inputs.version != ''
-    uses: ./.github/workflows/pipeline-deploy.yml
-    with:
-      environment: ${{ inputs.environment }}
-      project: ${{ inputs.project }}
-      version: ${{ inputs.version}}
     secrets: inherit
