@@ -67,7 +67,7 @@ jobs:
         uses: getsentry/action-release@v3
         env:
           SENTRY_ORG: ministryofjustice
-          SENTRY_PROJECT: ${{ inputs.project }}
+          SENTRY_PROJECT: probation-search-${{ inputs.project }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
         with:
           environment: ${{ inputs.environment }}
