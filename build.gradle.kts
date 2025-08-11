@@ -16,7 +16,7 @@ plugins {
     id("org.springframework.boot") version "3.5.4" apply false
     id("io.spring.dependency-management") version "1.1.7" apply false
     id("com.google.cloud.tools.jib") version "3.4.5" apply false
-    id("io.sentry.jvm.gradle") version "5.8.0" apply false
+    id("io.sentry.jvm.gradle") version "5.8.1" apply false
     id("idea")
 }
 
