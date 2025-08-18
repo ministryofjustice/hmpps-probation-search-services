@@ -3,7 +3,7 @@ rootProject.name = "probation-search-services"
 dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
-            library("applicationinsights", "com.microsoft.azure:applicationinsights-web:3.7.3")
+            library("applicationinsights", "com.microsoft.azure:applicationinsights-web:3.7.4")
             library("opensearch-starter", "org.opensearch.client:spring-data-opensearch-starter:2.0.0")
             library("opensearch-client", "org.opensearch.client:opensearch-java:3.2.0")
             library("testcontainers-opensearch", "org.opensearch:opensearch-testcontainers:3.0.2")
