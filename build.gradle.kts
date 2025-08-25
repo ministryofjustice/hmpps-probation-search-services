@@ -10,13 +10,13 @@ import org.springframework.boot.gradle.tasks.bundling.BootJar
 import org.springframework.boot.gradle.tasks.run.BootRun
 
 plugins {
-    kotlin("jvm") version "2.2.0"
-    kotlin("plugin.spring") version "2.2.0" apply false
-    kotlin("plugin.jpa") version "2.2.0" apply false
-    id("org.springframework.boot") version "3.5.4" apply false
+    kotlin("jvm") version "2.2.10"
+    kotlin("plugin.spring") version "2.2.10" apply false
+    kotlin("plugin.jpa") version "2.2.10" apply false
+    id("org.springframework.boot") version "3.5.5" apply false
     id("io.spring.dependency-management") version "1.1.7" apply false
     id("com.google.cloud.tools.jib") version "3.4.5" apply false
-    id("io.sentry.jvm.gradle") version "5.8.1" apply false
+    id("io.sentry.jvm.gradle") version "5.9.0" apply false
     id("idea")
 }
 
@@ -41,7 +41,7 @@ subprojects {
     }
 
     dependencies {
-        configurations.create("agent")("com.microsoft.azure:applicationinsights-agent:3.7.3")
+        configurations.create("agent")("com.microsoft.azure:applicationinsights-agent:3.7.4")
     }
 
     kotlin {
