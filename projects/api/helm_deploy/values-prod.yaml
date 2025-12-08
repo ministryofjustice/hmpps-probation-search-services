@@ -14,5 +14,5 @@ generic-prometheus-alerts:
   alertSeverity: probation-integration-notifications
   openSearchAlertsDomainNames:
     cloud-platform-1cc47140: OpenSearch
-  openSearchAlertsFreeStorageSpaceThresholdGB: 375
+  openSearchAlertsFreeStorageSpaceThresholdGB: 60
   openSearchAlertsClusterStatusYellowMinutes: 180
